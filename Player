@@ -1,0 +1,149 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Player : MonoBehaviour
+{
+    public float vel;
+    private Rigidbody2D rb;
+    private Transform trans;
+    private Animator anim;
+
+    public bool andando;
+    public bool Flip;
+
+    public float axis;
+
+    public float PuloForca;
+
+    public bool chao;
+    public float raio;
+
+    public Transform raio2;
+
+    public LayerMask Lchao;
+
+    public int vidaAtual;
+    public int MaxVida;
+
+    public bool morte;
+
+    public float knock;
+    public float tempoKnock;
+    public float tempoTotalKnock;
+
+    public bool ConfirmKnock;
+
+
+    void Start()
+    {
+        anim = GetComponent<Animator>();
+        rb = GetComponent<Rigidbody2D>();
+        trans = GetComponent<Transform>();
+        Flip = true;
+
+        vidaAtual = MaxVida;
+    }
+
+    
+    void Update()
+    {
+
+        chao = Physics2D.OverlapCircle(raio2.position, raio, Lchao);
+
+
+        axis = Input.GetAxisRaw("Horizontal");
+        andando = Mathf.Abs(axis) > 0;
+                
+        if(axis >0f && !Flip)
+        {
+            flip();
+        } else if (axis <0f && Flip)
+        {
+            flip();
+        }
+        animacao();
+
+        if (Input.GetButtonDown("Jump") && chao && !morte)
+        {
+            rb.AddForce(trans.up * PuloForca);
+        }
+
+        if(vidaAtual > MaxVida)
+        {
+            vidaAtual = MaxVida;
+        } 
+        if(vidaAtual <= 0)
+        {
+            morte = true;
+        }
+        if (ConfirmKnock)
+        {
+            tempoKnock -= Time.deltaTime;
+        }
+        if(tempoKnock <= 0)
+        {
+            ConfirmKnock = false;
+        }
+    }
+    private void FixedUpdate()
+    {
+        if (!morte && !ConfirmKnock)
+        {
+            if (andando && Flip)
+            {
+                rb.velocity = new Vector2(vel, rb.velocity.y);
+            }
+            else if (andando && !Flip)
+            {
+                rb.velocity = new Vector2(-vel, rb.velocity.y);
+            }
+        }
+    }
+    void flip()
+    {
+        if (!morte && !ConfirmKnock)
+        {
+            Flip = !Flip;
+            trans.localScale = new Vector2(-trans.localScale.x, trans.localScale.y);
+        }
+    }
+    void animacao()
+    {
+        anim.SetBool("Andando", andando);
+        anim.SetFloat("VelVertical", rb.velocity.y);
+        anim.SetBool("jump", !chao);
+        anim.SetBool("morte", morte);
+        anim.SetBool("Knock", ConfirmKnock);
+    }
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.green;
+        Gizmos.DrawSphere(raio2.position, raio);
+    }
+
+    public void dano(int dmg)
+    {
+        vidaAtual -= dmg;
+        gameObject.GetComponent<Animation>().Play("DanoNoPlayer");
+    }
+    
+    public void KnockDireita()
+    {
+        if(morte == false)
+        {
+            rb.velocity = new Vector2(10,knock*0);
+            tempoKnock = tempoTotalKnock;
+            ConfirmKnock = true;
+        }
+    }
+    public void KnockEsquerda()
+    {
+        if (morte == false)
+        {
+            rb.velocity = new Vector2(-10,knock* 0);
+            tempoKnock = tempoTotalKnock;
+            ConfirmKnock = true;
+        }
+    }
+}
