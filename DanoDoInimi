@@ -1,0 +1,34 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Dano : MonoBehaviour
+{
+    private Transform PlayerTrans;
+
+    void Start()
+    {
+        PlayerTrans = GameObject.FindGameObjectWithTag("Player").GetComponent<Transform>(); 
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
+
+    private void OnTriggerEnter2D(Collider2D outro)
+    {
+        if(outro.tag == "Player" && outro.isTrigger != true && PlayerTrans.transform.position.x > transform.position.x)
+        {
+            outro.GetComponent<Player>().dano(1);
+            outro.GetComponent<Player>().KnockDireita();
+        } 
+        else if (outro.tag == "Player" && outro.isTrigger != true && PlayerTrans.transform.position.x < transform.position.x)
+        {
+            outro.GetComponent<Player>().dano(1);
+            outro.GetComponent<Player>().KnockEsquerda();
+            
+        }
+    }
+}
