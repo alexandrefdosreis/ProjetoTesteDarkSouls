@@ -1,0 +1,98 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class inimigo : MonoBehaviour
+{
+
+    Animator anim;
+
+    public bool andando;
+
+    public Transform direita;
+    public Transform esquerda;
+    public Transform pontoAtaque;
+
+    public bool andandoDireita;
+    public bool andandoEsquerda;
+    public bool ProntoAtaque;
+
+    public float RangeDeAtk;
+    public float RangeDeAndar;
+    public float vel;
+    public LayerMask PlayerLayer;
+
+    VidaInim el;
+    public float AtkTempo;
+    public float AtkTempoLimite;
+    public Transform AtkPonto;
+    public GameObject AtkPrefab;
+    
+    void Start()
+    {
+        anim = GetComponent<Animator>();
+        el = GetComponent<VidaInim>();
+    }
+
+    
+    void Update()
+    {
+
+        anim.SetBool("andandoo", andando);
+        anim.SetBool("AtkInim", ProntoAtaque);
+               
+
+        andandoDireita = Physics2D.OverlapCircle(direita.position, RangeDeAndar, PlayerLayer);
+        andandoEsquerda = Physics2D.OverlapCircle(esquerda.position, RangeDeAndar, PlayerLayer);
+        ProntoAtaque = Physics2D.OverlapCircle(pontoAtaque.position, RangeDeAtk, PlayerLayer);
+
+        
+        
+            if (andandoDireita || andandoEsquerda)
+            {
+                andando = true;
+            }
+            else
+            {
+                andando = false;
+            }
+
+        if (!el.morte)
+        {
+            if (andandoDireita)
+            {
+                gameObject.GetComponent<SpriteRenderer>().flipX = false;
+                transform.position = Vector3.MoveTowards(transform.position, direita.transform.position, vel * Time.deltaTime);
+            }
+            if (andandoEsquerda)
+            {
+                gameObject.GetComponent<SpriteRenderer>().flipX = true;
+                transform.position = Vector3.MoveTowards(transform.position, esquerda.transform.position, vel * Time.deltaTime);
+            }
+        }
+        if (!el.morte)
+        {
+            if (ProntoAtaque && AtkTempo < AtkTempoLimite)
+            {
+                AtkTempo += Time.deltaTime;
+            }
+            else
+            {
+                AtkTempo = 0;
+            }
+            if (AtkTempo >= AtkTempoLimite)
+            {
+                Instantiate(AtkPrefab, AtkPonto.position, AtkPonto.rotation);
+            }
+        }
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.blue;
+
+        Gizmos.DrawWireSphere(direita.position, RangeDeAndar);
+        Gizmos.DrawWireSphere(esquerda.position, RangeDeAndar);
+        Gizmos.DrawWireSphere(pontoAtaque.position, RangeDeAtk);
+    }
+}
