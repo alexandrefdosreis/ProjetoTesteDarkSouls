@@ -1,0 +1,41 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class AtkPlayer : MonoBehaviour
+{
+    public Transform AtkSpawn;
+    public GameObject AtkPrefab;
+    public bool Atk = false;
+
+    private float AtkTempo = 0;
+    private float AtkCd = 0.9f;
+    private Animator anim;
+
+    void Start()
+    {
+        anim = gameObject.GetComponent<Animator>();   
+    }
+
+    
+    void FixedUpdate()
+    {
+        if(Input.GetKeyDown(KeyCode.Z) && !Atk)
+        {
+            Atk = true;
+            AtkTempo = AtkCd;
+            Instantiate(AtkPrefab, AtkSpawn.position, AtkSpawn.rotation);
+        }
+        if (Atk)
+        {
+            if(AtkTempo > 0)
+            {
+                AtkTempo -= Time.deltaTime;
+            } else
+            {
+                Atk = false;
+            }
+        }
+        anim.SetBool("atk", Atk);
+    }
+}
