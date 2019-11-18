@@ -1,0 +1,42 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class VidaInim : MonoBehaviour
+{
+    public int Vida;
+    public bool morte;
+
+    Animator anim;
+
+    public float TempoDestroi;
+    private BoxCollider2D box;
+
+    void Start()
+    {
+        anim = GetComponent<Animator>();
+        box = GetComponent<BoxCollider2D>();
+    }
+
+   
+    void Update()
+    {
+        if(Vida <= 0)
+        {
+            morte = true;            
+        }
+        anim.SetBool("morte", morte);
+
+        if (morte)
+        {
+            Destroy(gameObject, TempoDestroi);
+            box.enabled = false;
+        }
+    }
+
+    public void danoInim(int dmg)
+    {
+        Vida -= dmg;
+        gameObject.GetComponent<Animation>().Play("DanoNoInim");
+    }
+}
