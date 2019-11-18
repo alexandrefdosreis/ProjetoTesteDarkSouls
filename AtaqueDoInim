@@ -1,0 +1,37 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class AtkInim : MonoBehaviour
+{
+
+    public float AtkPrefabLife;
+
+    private Transform playerTrans;
+
+    void Start()
+    {
+        playerTrans = GameObject.FindGameObjectWithTag("Player").GetComponent<Transform>();
+    }
+
+
+    void Update()
+    {
+        Destroy(gameObject, AtkPrefabLife);
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.tag == "Player" && collision.isTrigger != true && playerTrans.transform.position.x > transform.position.x)
+        {
+            collision.GetComponent<Player>().dano(2);
+            collision.GetComponent<Player>().KnockDireita();
+        }
+        else if (collision.tag == "Player" && collision.isTrigger != true && playerTrans.transform.position.x < transform.position.x)
+        {
+            collision.GetComponent<Player>().dano(2);
+            collision.GetComponent<Player>().KnockEsquerda();
+
+        }
+    }
+}
